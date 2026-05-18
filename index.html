@@ -1,0 +1,755 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Bau 112 · Alsterkrugchaussee</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display&family=DM+Sans:wght@300;400;500;600&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+:root {
+  --ink: #18160F;
+  --ink2: #4A4540;
+  --ink3: #9A9088;
+  --bg: #F2EFE8;
+  --surface: #FDFAF3;
+  --border: #E2DDD5;
+  --brick: #C04830;
+  --brick-pale: #FBE9E5;
+  --green: #2E6B48;
+  --green-pale: #E2EFE8;
+  --amber: #B87020;
+  --amber-pale: #FBF0DF;
+  --blue: #2A4E78;
+  --blue-pale: #E2EAF5;
+  --r: 12px;
+  --r-sm: 8px;
+}
+* { box-sizing: border-box; margin: 0; padding: 0; }
+html { -webkit-font-smoothing: antialiased; }
+body { font-family: 'DM Sans', sans-serif; background: var(--bg); color: var(--ink); font-size: 14px; line-height: 1.6; min-height: 100vh; }
+
+/* HEADER */
+.header {
+  background: var(--ink);
+  padding: 0 24px;
+  height: 58px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  position: sticky;
+  top: 0;
+  z-index: 100;
+}
+.logo {
+  font-family: 'DM Serif Display', serif;
+  font-size: 19px;
+  color: #fff;
+  letter-spacing: -.3px;
+}
+.logo span { color: #E07858; }
+.tabs {
+  display: flex;
+  background: rgba(255,255,255,.08);
+  border-radius: 10px;
+  padding: 3px;
+  gap: 2px;
+}
+.tab {
+  background: none;
+  border: none;
+  color: rgba(255,255,255,.5);
+  font-family: 'DM Sans', sans-serif;
+  font-size: 13px;
+  font-weight: 500;
+  padding: 6px 16px;
+  border-radius: 7px;
+  cursor: pointer;
+  transition: all .2s;
+}
+.tab.active { background: #fff; color: var(--ink); }
+.who { display: flex; gap: -4px; }
+.av {
+  width: 30px;
+  height: 30px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 11px;
+  font-weight: 600;
+  border: 2px solid var(--ink);
+}
+.av-s { background: #3a5f8a; color: #fff; margin-right: -8px; }
+.av-b { background: #2E6B48; color: #fff; }
+
+/* DEADLINE BAR */
+.dlbar {
+  background: #2C1F1C;
+  padding: 9px 24px;
+  display: flex;
+  gap: 20px;
+  flex-wrap: wrap;
+  align-items: center;
+}
+.dl {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  font-size: 12px;
+  color: rgba(255,255,255,.65);
+  font-weight: 400;
+}
+.dl-val {
+  background: rgba(0,0,0,.2);
+  color: #fff;
+  font-family: 'DM Mono', monospace;
+  font-size: 11px;
+  font-weight: 500;
+  padding: 2px 8px;
+  border-radius: 5px;
+}
+.dl-warn {
+  background: #FBBD23;
+  color: #5a3800;
+  font-family: 'DM Mono', monospace;
+  font-size: 11px;
+  font-weight: 600;
+  padding: 2px 8px;
+  border-radius: 5px;
+}
+.dl-sep { color: rgba(255,255,255,.2); }
+
+/* PAGE */
+.page { display: none; max-width: 680px; margin: 0 auto; padding: 24px 16px; }
+.page.active { display: block; }
+
+/* PROGRESS */
+.progress-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--r);
+  padding: 16px 20px;
+  margin-bottom: 16px;
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+.prog-circle {
+  width: 52px;
+  height: 52px;
+  flex-shrink: 0;
+  position: relative;
+}
+.prog-circle svg { transform: rotate(-90deg); }
+.prog-circle-text {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: 'DM Mono', monospace;
+  font-size: 12px;
+  font-weight: 500;
+  color: var(--ink);
+}
+.prog-info { flex: 1; }
+.prog-title { font-weight: 500; font-size: 15px; margin-bottom: 2px; }
+.prog-sub { font-size: 12px; color: var(--ink3); }
+.prog-bar-wrap { height: 5px; background: var(--border); border-radius: 3px; overflow: hidden; margin-top: 8px; }
+.prog-bar-fill { height: 100%; background: var(--green); border-radius: 3px; transition: width .5s ease; }
+
+/* ADD ROW */
+.add-row {
+  display: flex;
+  gap: 8px;
+  margin-bottom: 16px;
+}
+.add-inp {
+  flex: 1;
+  padding: 11px 16px;
+  border: 1.5px solid var(--border);
+  border-radius: var(--r-sm);
+  font-family: 'DM Sans', sans-serif;
+  font-size: 14px;
+  background: var(--surface);
+  color: var(--ink);
+  outline: none;
+  transition: border-color .2s;
+}
+.add-inp:focus { border-color: var(--brick); }
+.add-inp::placeholder { color: var(--ink3); }
+.add-btn {
+  background: var(--ink);
+  color: #fff;
+  border: none;
+  border-radius: var(--r-sm);
+  padding: 11px 20px;
+  font-family: 'DM Sans', sans-serif;
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background .2s;
+  white-space: nowrap;
+}
+.add-btn:hover { background: #a03820; }
+
+/* FILTERS */
+.filters {
+  display: flex;
+  gap: 5px;
+  flex-wrap: wrap;
+  margin-bottom: 16px;
+}
+.filt {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 20px;
+  padding: 5px 13px;
+  font-size: 12px;
+  font-weight: 500;
+  cursor: pointer;
+  color: var(--ink2);
+  transition: all .15s;
+  font-family: 'DM Sans', sans-serif;
+}
+.filt:hover { border-color: var(--ink2); }
+.filt.active { background: var(--ink); color: #fff; border-color: var(--ink); }
+
+/* FLOOR LABEL */
+.floor-label {
+  font-size: 10px;
+  font-weight: 600;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  color: var(--ink3);
+  padding: 16px 4px 7px;
+}
+
+/* TASK */
+.task {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  padding: 13px 16px;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--r-sm);
+  margin-bottom: 5px;
+  cursor: pointer;
+  transition: border-color .15s, box-shadow .15s;
+}
+.task:hover { border-color: #c4bdb5; box-shadow: 0 2px 8px rgba(0,0,0,.06); }
+.task.done { opacity: .4; }
+.cb {
+  width: 20px;
+  height: 20px;
+  border: 2px solid var(--border);
+  border-radius: 6px;
+  flex-shrink: 0;
+  margin-top: 1px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 11px;
+  color: #fff;
+  transition: all .2s;
+  background: transparent;
+}
+.task.done .cb { background: var(--green); border-color: var(--green); }
+.task-body { flex: 1; min-width: 0; }
+.task-text { font-size: 14px; font-weight: 500; line-height: 1.35; }
+.task.done .task-text { text-decoration: line-through; color: var(--ink3); }
+.task-meta { font-size: 11px; color: var(--ink3); margin-top: 4px; display: flex; gap: 10px; align-items: center; }
+.prio-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 10px;
+  font-weight: 600;
+  padding: 2px 7px;
+  border-radius: 4px;
+}
+.prio-1 { background: #FBE9E5; color: #C04830; }
+.prio-2 { background: var(--amber-pale); color: var(--amber); }
+.prio-3 { background: var(--bg); color: var(--ink3); }
+.prio-dot { width: 6px; height: 6px; border-radius: 50%; }
+.prio-dot-1 { background: var(--brick); }
+.prio-dot-2 { background: var(--amber); }
+.prio-dot-3 { background: var(--ink3); }
+
+/* CHAT */
+.chat-page { display: none; max-width: 680px; margin: 0 auto; padding: 16px; height: calc(100vh - 112px); flex-direction: column; }
+.chat-page.active { display: flex; }
+.shortcuts { display: flex; gap: 6px; flex-wrap: wrap; margin-bottom: 12px; }
+.sc {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 20px;
+  padding: 6px 13px;
+  font-size: 12px;
+  font-weight: 500;
+  cursor: pointer;
+  color: var(--ink2);
+  font-family: 'DM Sans', sans-serif;
+  transition: all .15s;
+}
+.sc:hover { border-color: var(--brick); color: var(--brick); }
+.msgs {
+  flex: 1;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  padding-right: 4px;
+  scroll-behavior: smooth;
+}
+.msg {
+  max-width: 88%;
+  padding: 11px 15px;
+  border-radius: 14px;
+  font-size: 14px;
+  line-height: 1.6;
+}
+.msg-user {
+  align-self: flex-end;
+  background: var(--ink);
+  color: #fff;
+  border-bottom-right-radius: 4px;
+}
+.msg-ai {
+  align-self: flex-start;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  color: var(--ink);
+  border-bottom-left-radius: 4px;
+}
+.msg-name {
+  font-size: 10px;
+  font-weight: 600;
+  letter-spacing: .5px;
+  text-transform: uppercase;
+  color: var(--ink3);
+  margin-bottom: 4px;
+}
+.chat-form {
+  display: flex;
+  gap: 8px;
+  padding-top: 14px;
+  border-top: 1px solid var(--border);
+  margin-top: 10px;
+}
+.chat-inp {
+  flex: 1;
+  padding: 12px 16px;
+  border: 1.5px solid var(--border);
+  border-radius: var(--r-sm);
+  font-family: 'DM Sans', sans-serif;
+  font-size: 14px;
+  background: var(--surface);
+  color: var(--ink);
+  outline: none;
+  transition: border-color .2s;
+}
+.chat-inp:focus { border-color: var(--brick); }
+.chat-inp::placeholder { color: var(--ink3); }
+.send-btn {
+  background: #2C1F1C;
+  color: #fff;
+  border: none;
+  border-radius: var(--r-sm);
+  padding: 12px 20px;
+  font-family: 'DM Sans', sans-serif;
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background .2s;
+  white-space: nowrap;
+}
+.send-btn:hover { background: #a03820; }
+.send-btn:disabled { opacity: .5; cursor: not-allowed; }
+.typing { display: flex; gap: 4px; align-items: center; padding: 4px 0; }
+.dot { width: 6px; height: 6px; border-radius: 50%; background: var(--ink3); animation: bop 1.2s infinite; }
+.dot:nth-child(2) { animation-delay: .2s; }
+.dot:nth-child(3) { animation-delay: .4s; }
+@keyframes bop { 0%,60%,100% { transform: translateY(0); } 30% { transform: translateY(-5px); } }
+
+/* EMPTY */
+.empty { text-align: center; padding: 40px 20px; color: var(--ink3); font-size: 14px; }
+</style>
+</head>
+<body>
+
+<header class="header">
+  <div class="logo">Alsterkrug<span>chaussee 112</span></div>
+  <div class="tabs">
+    <button class="tab active" onclick="show('tasks',this)">Aufgaben</button>
+    <button class="tab" onclick="show('chat',this)">KI-Assistent</button>
+  </div>
+  <div class="who">
+    <div class="av av-s">S</div>
+    <div class="av av-b">B</div>
+  </div>
+</header>
+
+<div class="dlbar">
+  <div class="dl">🏠 Einzug WE3 <span class="dl-val" id="d1">…</span></div>
+  <span class="dl-sep">·</span>
+  <div class="dl">🔑 Übergabe <span class="dl-val" id="d2">…</span></div>
+  <span class="dl-sep">·</span>
+  <div class="dl">🪟 Fenster-Anzahlung <span class="dl-warn" id="d3">…</span></div>
+</div>
+
+<!-- AUFGABEN -->
+<div id="page-tasks" class="page active">
+
+  <div class="progress-card">
+    <div class="prog-circle">
+      <svg width="52" height="52" viewBox="0 0 52 52">
+        <circle cx="26" cy="26" r="21" fill="none" stroke="#E2DDD5" stroke-width="5"/>
+        <circle id="prog-arc" cx="26" cy="26" r="21" fill="none" stroke="#2E6B48" stroke-width="5" stroke-linecap="round" stroke-dasharray="132" stroke-dashoffset="132"/>
+      </svg>
+      <div class="prog-circle-text" id="prog-pct">0%</div>
+    </div>
+    <div class="prog-info">
+      <div class="prog-title" id="prog-title">Projekt-Fortschritt</div>
+      <div class="prog-sub" id="prog-sub">0 von 0 Aufgaben erledigt</div>
+    </div>
+  </div>
+
+  <div class="add-row">
+    <input class="add-inp" id="new-inp" placeholder="Neue Aufgabe eingeben…" onkeydown="if(event.key==='Enter')addTask()">
+    <button class="add-btn" onclick="addTask()">+ Hinzufügen</button>
+  </div>
+
+  <div class="filters">
+    <button class="filt active" onclick="filt('all',this)">Alle</button>
+    <button class="filt" onclick="filt('open',this)">Offen</button>
+    <button class="filt" onclick="filt('high',this)">Dringend</button>
+    <button class="filt" onclick="filt('KG',this)">Keller</button>
+    <button class="filt" onclick="filt('DG',this)">DG</button>
+    <button class="filt" onclick="filt('2OG',this)">2.OG</button>
+    <button class="filt" onclick="filt('1OG',this)">1.OG</button>
+    <button class="filt" onclick="filt('EG',this)">EG</button>
+  </div>
+
+  <div id="task-list"></div>
+</div>
+
+<!-- CHAT -->
+<div id="page-chat" class="chat-page">
+  <div class="shortcuts">
+    <button class="sc" onclick="sc('Was muss ich diese Woche tun?')">📋 Diese Woche</button>
+    <button class="sc" onclick="sc('Wer macht was bis 1. August?')">👷 Wer macht was</button>
+    <button class="sc" onclick="sc('Was muss vor dem 1. Juni fertig sein?')">📅 Vor Übergabe</button>
+    <button class="sc" onclick="sc('Was sind die dringendsten Aufgaben heute?')">🔴 Dringend</button>
+    <button class="sc" onclick="sc('Wie ist der Stand beim Bauantrag?')">🏛 Bauantrag</button>
+    <button class="sc" onclick="sc('Was muss Sabrina diese Woche tun?')">👩 Sabrina</button>
+  </div>
+  <div class="msgs" id="msgs">
+    <div class="msg msg-ai">
+      <div class="msg-name">Bauplan-Assistent</div>
+      Hallo! Ich kenne euer Projekt komplett – alle Aufgaben, Gewerke, Deadlines und den Bauantrag.<br><br>
+      <strong>Heute am dringendsten:</strong><br>
+      🔴 BAFA-Antrag Wärmepumpe – 7-Tage-Frist!<br>
+      🔴 Prüfingenieur Statik aus 3 Optionen auswählen<br>
+      💶 Fenster-Anzahlung 95% bis 1. Juni (73.387 €)<br><br>
+      Stellt mir einfach Fragen oder gebt neue Infos ein.
+    </div>
+  </div>
+  <div class="chat-form">
+    <input class="chat-inp" id="chat-inp" placeholder="Frage stellen oder neue Info eingeben…" onkeydown="if(event.key==='Enter')sendChat()">
+    <button class="send-btn" id="send-btn" onclick="sendChat()">Senden →</button>
+  </div>
+</div>
+
+<script>
+const API_KEY = 'DEIN_API_KEY_HIER';
+const SB_URL = 'https://tfpcrsceuimtidgquivt.supabase.co';
+const SB_KEY = 'sb_publishable_NyHH0AQuLHBFEIOnXB4WLw_apJ1BVD5';
+
+const INIT = [
+  {id:'k1',floor:'KG',text:'BAFA-Förderungsantrag Wärmepumpe stellen (7-Tage-Frist!)',prio:1,who:'Sebastian & Sabrina',done:false},
+  {id:'k2',floor:'KG',text:'Prüfingenieur Statik beauftragen (Mahutka / Drude / Stavesand)',prio:1,who:'Sebastian + KAO Rittner',done:false},
+  {id:'k3',floor:'KG',text:'Gutachter Mauerwerk beauftragen – VOR Gerüst!',prio:1,who:'Sebastian & Sabrina',done:false},
+  {id:'k4',floor:'KG',text:'Müllcontainer bestellen',prio:1,who:'Sebastian & Sabrina',done:false},
+  {id:'k5',floor:'KG',text:'Wärmepumpe Vitocal 252-A installieren',prio:1,who:'Klink GmbH',done:false},
+  {id:'k6',floor:'KG',text:'Gasheizung ausbauen',prio:1,who:'Klink GmbH',done:false},
+  {id:'k7',floor:'KG',text:'Elektroschrank Keller einbauen',prio:1,who:'Hr. Blume',done:false},
+  {id:'d1',floor:'DG',text:'Wände und Decken streichen',prio:1,who:'Damian',done:false},
+  {id:'d2',floor:'DG',text:'Boden aufbereiten / streichen',prio:1,who:'Damian',done:false},
+  {id:'d3',floor:'DG',text:'Heizkörper DG neu einbauen',prio:1,who:'Klink GmbH',done:false},
+  {id:'d4',floor:'DG',text:'Bad DG fertigstellen (5,80 m²)',prio:1,who:'Klink + Damian',done:false},
+  {id:'d5',floor:'DG',text:'Büro abtrennen – Trockenbau',prio:2,who:'Damian',done:false},
+  {id:'o1',floor:'2OG',text:'Boden 2.OG neu einbauen',prio:1,who:'Damian',done:false},
+  {id:'o2',floor:'2OG',text:'Emilys Zimmer streichen (17,70 m²)',prio:1,who:'Damian',done:false},
+  {id:'o3',floor:'2OG',text:'Kind2-Zimmer streichen (21,30 m²)',prio:1,who:'Damian',done:false},
+  {id:'o4',floor:'2OG',text:'Bad 2.OG fertigstellen (4,60 m²)',prio:1,who:'Klink + Damian',done:false},
+  {id:'o5',floor:'2OG',text:'Schleuse gegen Baudreck bauen – Fenster erst KW37!',prio:1,who:'Damian',done:false},
+  {id:'p1',floor:'1OG',text:'Teppich rausreißen',prio:1,who:'Damian',done:false},
+  {id:'p2',floor:'1OG',text:'Eichenstabparkett schleifen und aufbereiten',prio:1,who:'Damian',done:false},
+  {id:'p3',floor:'1OG',text:'Durchbruch tragende Mittelwand (Genehmigung läuft)',prio:1,who:'Hamsden',done:false},
+  {id:'p4',floor:'1OG',text:'Küche aufbauen – gartenseitig',prio:1,who:'Damian + Klink',done:false},
+  {id:'p5',floor:'1OG',text:'Elektrik WE3 ergänzen',prio:1,who:'Hr. Blume',done:false},
+  {id:'p6',floor:'1OG',text:'Balkonfenster abdichten',prio:1,who:'Damian',done:false},
+  {id:'p7',floor:'1OG',text:'Gartentreppe vom 1.OG bauen',prio:2,who:'Hamsden + Damian',done:false},
+  {id:'e1',floor:'EG',text:'Abriss Bestand WE1 und WE2',prio:1,who:'Damian',done:false},
+  {id:'e2',floor:'EG',text:'Abwasserleitung entscheiden: Inliner oder aufheben?',prio:1,who:'Klink GmbH',done:false},
+  {id:'e3',floor:'EG',text:'Bad WE1 neu bauen (2,80 m²)',prio:1,who:'Klink + Damian',done:false},
+  {id:'e4',floor:'EG',text:'Bad WE2 neu bauen (2,80 m²)',prio:1,who:'Klink + Damian',done:false},
+  {id:'e5',floor:'EG',text:'Elektrik WE1 und WE2 komplett neu',prio:1,who:'Hr. Blume',done:false},
+  {id:'e6',floor:'EG',text:'Decke raus und Schallschutz neu einbauen',prio:1,who:'Damian',done:false},
+  {id:'e7',floor:'EG',text:'Estrich einbringen',prio:2,who:'Damian',done:false},
+];
+
+const SYS = `Du bist der Bauplan-Assistent für Alsterkrugchaussee 112, Hamburg. Du antwortest für Sebastian Wagner und Sabrina Beck.
+
+OBJEKT: Alsterkrugchaussee 112, 22297 Hamburg. Baujahr 1926, Mittelreihenhaus. 3 Wohneinheiten: WE1 EG links 27,95m², WE2 EG rechts 28,60m², WE3 1OG–DG 180,01m² – EINZUG 1. AUGUST 2026.
+
+DEADLINES:
+- Sofort: BAFA-Antrag Wärmepumpe (7-Tage-Frist nach Vertragsabschluss!)
+- 1. Juni 2026: Übergabe + Fenster-Anzahlung 95% = ca. 69.700 € (3% Skonto möglich)
+- 1. August 2026: Einzug Familie WE3 – alles muss fertig sein
+- KW37 / ca. 8. September 2026: Fensterlieferung Scheper – kommt NACH dem Einzug!
+
+GEWERKE:
+- Damian: Abriss, Handwerk, Streichen
+- Hr. Blume: Elektriker
+- Jens Scheper / La fenêtre: Fenster, Tel. 040/791730, beauftragt 7.5.2026, 73.387 €
+- Hamsden: Maurer
+- Klink GmbH: Bad und Heizung, Tel. 04551840716, info@klinkgmbh.com
+- KAO / Kerstin Rittner: Architektin, Tel. 040-434056, rittner@kao-architekten.de
+- planwerk elbe / Tobias Uebelgünn: Tragwerk, Tel. 040/555546-137
+
+NOCH NICHT BEAUFTRAGT:
+- Prüfingenieur Statik (3 Optionen: Prof. Mahutka pruef@krameralbrecht.de, Dr. Drude pruefung@wk-consult.com, Stavesand info@gus-ing.de)
+- Gutachter Mauerwerk (VOR Maurergerüst!)
+- Lüftungskonzept DIN 1946-6
+
+BAUANTRAG: N-WBZ-507-2026. Sachbearbeiterin Merve Erdogrul, 040 42804-6420. Offen: Prüfverzicht §68 Abs.2 HBauO.
+
+OFFENE ENTSCHEIDUNGEN: BAFA-Antrag, Prüfingenieur wählen, Abwasser EG (Inliner?), Gutachter Mauerwerk, Lüftungskonzept, Müllcontainer, Überfahrt-Status prüfen (VG: 30-030-26056-000008).
+
+Antworte immer auf Deutsch. Kurz, klar, praktisch. Sag konkret wer was bis wann tun muss. Wenn du neue Aufgaben erkennst, schreibe sie am Ende als: → Aufgabe: [Aufgabentext]`;
+
+let tasks = [];
+let curFilt = 'all';
+let chatHistory = [];
+
+
+async function load() {
+  try {
+    const r = await fetch(SB_URL + '/rest/v1/tasks?select=*&order=id', {
+      headers: { 'apikey': SB_KEY, 'Authorization': 'Bearer ' + SB_KEY }
+    });
+    if (r.ok) {
+      const data = await r.json();
+      if (data.length > 0) {
+        tasks = data;
+      } else {
+        tasks = INIT.map(t => ({...t}));
+        await saveAll();
+      }
+    } else {
+      tasks = INIT.map(t => ({...t}));
+    }
+  } catch(e) {
+    const saved = localStorage.getItem('bau112-tasks');
+    tasks = saved ? JSON.parse(saved) : INIT.map(t => ({...t}));
+  }
+  render(); updateProg();
+}
+
+async function save() {
+  try {
+    localStorage.setItem('bau112-tasks', JSON.stringify(tasks));
+  } catch(e) {}
+}
+
+async function saveAll() {
+  try {
+    await fetch(SB_URL + '/rest/v1/tasks', {
+      method: 'DELETE',
+      headers: { 'apikey': SB_KEY, 'Authorization': 'Bearer ' + SB_KEY, 'Content-Type': 'application/json' },
+      body: JSON.stringify({ id: tasks.map(t => t.id) })
+    });
+  } catch(e) {}
+  try {
+    await fetch(SB_URL + '/rest/v1/tasks', {
+      method: 'POST',
+      headers: { 'apikey': SB_KEY, 'Authorization': 'Bearer ' + SB_KEY, 'Content-Type': 'application/json', 'Prefer': 'return=minimal' },
+      body: JSON.stringify(tasks)
+    });
+    localStorage.setItem('bau112-tasks', JSON.stringify(tasks));
+  } catch(e) {}
+}
+
+async function toggle(id) {
+  const t = tasks.find(x => x.id === id);
+  if (!t) return;
+  t.done = !t.done;
+  save();
+  render(); updateProg();
+  try {
+    await fetch(SB_URL + '/rest/v1/tasks?id=eq.' + t.id, {
+      method: 'PATCH',
+      headers: { 'apikey': SB_KEY, 'Authorization': 'Bearer ' + SB_KEY, 'Content-Type': 'application/json' },
+      body: JSON.stringify({ done: t.done })
+    });
+  } catch(e) {}
+}
+
+async function addTask() {
+  const inp = document.getElementById('new-inp');
+  const txt = inp.value.trim();
+  if (!txt) return;
+  const newTask = {id:'u'+Date.now(), floor:'EG', text:txt, prio:2, who:'–', done:false};
+  tasks.push(newTask);
+  inp.value = '';
+  save(); render(); updateProg();
+  try {
+    await fetch(SB_URL + '/rest/v1/tasks', {
+      method: 'POST',
+      headers: { 'apikey': SB_KEY, 'Authorization': 'Bearer ' + SB_KEY, 'Content-Type': 'application/json', 'Prefer': 'return=minimal' },
+      body: JSON.stringify(newTask)
+    });
+  } catch(e) {}
+}
+
+async function addFromAI(text) {
+  const newTask = {id:'ai'+Date.now(), floor:'EG', text, prio:1, who:'–', done:false};
+  tasks.push(newTask);
+  save(); render(); updateProg();
+  try {
+    await fetch(SB_URL + '/rest/v1/tasks', {
+      method: 'POST',
+      headers: { 'apikey': SB_KEY, 'Authorization': 'Bearer ' + SB_KEY, 'Content-Type': 'application/json', 'Prefer': 'return=minimal' },
+      body: JSON.stringify(newTask)
+    });
+  } catch(e) {}
+}
+
+const FLOOR_NAMES = {KG:'Keller & Haustechnik', DG:'Dachgeschoss', '2OG':'2. Obergeschoss', '1OG':'1. Obergeschoss', EG:'Erdgeschoss'};
+
+function render() {
+  const floors = ['KG','DG','2OG','1OG','EG'];
+  let html = '';
+  floors.forEach(fl => {
+    let list = tasks.filter(t => t.floor === fl);
+    if (curFilt === 'open') list = list.filter(t => !t.done);
+    else if (curFilt === 'high') list = list.filter(t => t.prio === 1 && !t.done);
+    else if (!['all','open','high'].includes(curFilt) && curFilt !== fl) return;
+    if (!list.length) return;
+    html += `<div class="floor-label">${FLOOR_NAMES[fl]||fl}</div>`;
+    list.forEach(t => {
+      const pc = t.prio===1?'prio-1':t.prio===2?'prio-2':'prio-3';
+      const pl = t.prio===1?'Dringend':t.prio===2?'Mittel':'Niedrig';
+      const dotc = t.prio===1?'prio-dot-1':t.prio===2?'prio-dot-2':'prio-dot-3';
+      html += `<div class="task${t.done?' done':''}" onclick="toggle('${t.id}')">
+        <div class="cb">${t.done?'✓':''}</div>
+        <div class="task-body">
+          <div class="task-text">${t.text}</div>
+          <div class="task-meta">
+            <span class="prio-badge ${pc}"><span class="prio-dot ${dotc}"></span>${pl}</span>
+            <span>👷 ${t.who}</span>
+          </div>
+        </div>
+      </div>`;
+    });
+  });
+  document.getElementById('task-list').innerHTML = html || '<div class="empty">Keine Aufgaben in dieser Kategorie.</div>';
+}
+
+function updateProg() {
+  const done = tasks.filter(t => t.done).length;
+  const total = tasks.length;
+  const pct = total > 0 ? Math.round(done/total*100) : 0;
+  const circ = 132;
+  const offset = circ - (circ * pct / 100);
+  document.getElementById('prog-arc').style.strokeDashoffset = offset;
+  document.getElementById('prog-pct').textContent = pct + '%';
+  document.getElementById('prog-title').textContent = pct === 100 ? '🎉 Alles erledigt!' : 'Projekt-Fortschritt';
+  document.getElementById('prog-sub').textContent = done + ' von ' + total + ' Aufgaben erledigt';
+}
+
+function filt(f, btn) {
+  curFilt = f;
+  document.querySelectorAll('.filt').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  render();
+}
+
+function show(id, btn) {
+  document.querySelectorAll('.page, .chat-page').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('.tab').forEach(b => b.classList.remove('active'));
+  const el = document.getElementById('page-'+id);
+  if (el) el.classList.add('active');
+  btn.classList.add('active');
+  window.scrollTo(0,0);
+}
+
+function sc(t) { document.getElementById('chat-inp').value = t; sendChat(); }
+
+async function sendChat() {
+  const inp = document.getElementById('chat-inp');
+  const btn = document.getElementById('send-btn');
+  const msgs = document.getElementById('msgs');
+  const txt = inp.value.trim();
+  if (!txt) return;
+  inp.value = ''; btn.disabled = true;
+
+  msgs.innerHTML += `<div class="msg msg-user">${txt.replace(/</g,'&lt;')}</div>`;
+  const tid = 'tid'+Date.now();
+  msgs.innerHTML += `<div class="msg msg-ai" id="${tid}"><div class="msg-name">Assistent</div><div class="typing"><div class="dot"></div><div class="dot"></div><div class="dot"></div></div></div>`;
+  msgs.scrollTop = msgs.scrollHeight;
+
+  chatHistory.push({role:'user', content:txt});
+
+  try {
+    const res = await fetch('https://api.anthropic.com/v1/messages', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'x-api-key': API_KEY,
+        'anthropic-version': '2023-06-01',
+        'anthropic-dangerous-direct-browser-access': 'true',
+        'Access-Control-Allow-Origin': '*'
+      },
+      body: JSON.stringify({model:'claude-sonnet-4-20250514', max_tokens:800, system:SYS, messages:chatHistory})
+    });
+    const data = await res.json();
+    const reply = data.content?.map(c=>c.text||'').join('') || 'Fehler beim Laden.';
+    chatHistory.push({role:'assistant', content:reply});
+
+    const el = document.getElementById(tid);
+    if (el) el.innerHTML = '<div class="msg-name">Assistent</div>' +
+      reply.replace(/\*\*(.*?)\*\*/g,'<strong>$1</strong>').replace(/\n/g,'<br>');
+
+    const matches = [...reply.matchAll(/→ Aufgabe:\s*(.+?)(?:<br>|\n|$)/g)];
+    matches.forEach(m => {
+      const text = m[1].trim().replace(/<[^>]+>/g,'');
+      if (text.length > 3) addFromAI(text);
+    });
+  } catch(e) {
+    const el = document.getElementById(tid);
+    if (el) el.innerHTML = '<div class="msg-name">Fehler</div>API Key prüfen oder Verbindung unterbrochen.';
+  }
+
+  btn.disabled = false;
+  msgs.scrollTop = msgs.scrollHeight;
+}
+
+function updateDeadlines() {
+  const now = new Date();
+  const d = date => Math.max(0, Math.ceil((new Date(date)-now)/86400000));
+  document.getElementById('d1').textContent = d('2026-08-01')+' Tage';
+  document.getElementById('d2').textContent = d('2026-06-01')+' Tage';
+  document.getElementById('d3').textContent = d('2026-06-01')+' Tage';
+}
+
+load();
+updateDeadlines();
+setInterval(updateDeadlines, 60000);
+setInterval(load, 15000);
+</script>
+</body>
+</html>
